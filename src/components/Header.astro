@@ -52,11 +52,16 @@ const isActive = (href: string) =>
     </button>
   </div>
 
-  <!-- Mobile full-screen overlay -->
-  <div
-    id="mobile-menu"
-    class="fixed inset-0 z-50 hidden flex-col bg-ink lg:hidden"
-  >
+</header>
+
+<!-- Mobile full-screen overlay — kept OUTSIDE <header> on purpose. The header has
+     backdrop-blur, and an ancestor with backdrop-filter becomes the containing
+     block for position:fixed children, which would shrink this overlay to the
+     header bar. Outside the header it's positioned against the viewport. -->
+<div
+  id="mobile-menu"
+  class="fixed inset-0 z-[60] hidden flex-col bg-ink lg:hidden"
+>
     <div class="container-page flex items-center justify-between py-4">
       <span class="font-display text-lg text-cream">Zion Classique <span class="text-gold">Care</span></span>
       <button
@@ -87,7 +92,7 @@ const isActive = (href: string) =>
       </a>
     </nav>
   </div>
-</header>
+<!-- /mobile-menu -->
 
 <script is:inline>
   (function () {
