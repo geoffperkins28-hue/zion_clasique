@@ -1,0 +1,116 @@
+---
+// Contact submissions are written to the Supabase `messages` table (anon insert
+// allowed via RLS) and read by the owner in the /admin "Messages" tab.
+// No medical/PHI fields are collected.
+---
+<div class="card p-6 sm:p-8">
+  <form id="contact-form" class="space-y-5">
+    <!-- Honeypot: bots fill this; humans never see it. -->
+    <p class="hidden" aria-hidden="true">
+      <label>Leave this empty <input id="cf-bot" name="bot-field" tabindex="-1" autocomplete="off" /></label>
+    </p>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label for="name" class="mb-1.5 block text-caption font-semibold text-cream">Your name <span class="text-gold">*</span></label>
+        <input id="name" name="name" type="text" required autocomplete="name"
+          class="w-full rounded-btn border border-gold/20 bg-ink px-4 py-3 text-cream placeholder:text-sand/60 focus:border-gold focus:outline-none" />
+      </div>
+      <div>
+        <label for="phone" class="mb-1.5 block text-caption font-semibold text-cream">Phone <span class="text-gold">*</span></label>
+        <input id="phone" name="phone" type="tel" required autocomplete="tel"
+          class="w-full rounded-btn border border-gold/20 bg-ink px-4 py-3 text-cream placeholder:text-sand/60 focus:border-gold focus:outline-none" />
+      </div>
+    </div>
+
+    <div>
+      <label for="email" class="mb-1.5 block text-caption font-semibold text-cream">Email</label>
+      <input id="email" name="email" type="email" autocomplete="email"
+        class="w-full rounded-btn border border-gold/20 bg-ink px-4 py-3 text-cream placeholder:text-sand/60 focus:border-gold focus:outline-none" />
+    </div>
+
+    <div>
+      <label for="regarding" class="mb-1.5 block text-caption font-semibold text-cream">Who are you contacting about?</label>
+      <select id="regarding" name="regarding"
+        class="w-full rounded-btn border border-gold/20 bg-ink px-4 py-3 text-cream focus:border-gold focus:outline-none">
+        <option value="self">Myself</option>
+        <option value="family">A family member or loved one</option>
+        <option value="referral">A client referral (case manager / clinician)</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="message" class="mb-1.5 block text-caption font-semibold text-cream">How can we help?</label>
+      <textarea id="message" name="message" rows="4"
+        class="w-full rounded-btn border border-gold/20 bg-ink px-4 py-3 text-cream placeholder:text-sand/60 focus:border-gold focus:outline-none"
+        placeholder="Tell us a little about what you're looking for."></textarea>
+      <p class="mt-2 text-caption text-sand">
+        Please don't include any medical details in this form.
+      </p>
+    </div>
+
+    <button type="submit" id="cf-submit" class="btn-primary w-full text-lg">Send message</button>
+    <p id="form-error" class="hidden text-caption text-red-300" role="alert">
+      Something went wrong sending your message. Please call us instead — we're here 24/7.
+    </p>
+  </form>
+
+  <!-- Success state (hidden until submit) -->
+  <div id="form-success" class="hidden text-center" role="status">
+    <span class="mx-auto mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-gold/15 text-gold ring-1 ring-gold/30">
+      <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+    </span>
+    <h3 class="text-h3">Thanks — we'll reach out shortly.</h3>
+    <p class="mt-2 text-cream/85">For urgent help, call us anytime. We're here 24/7.</p>
+  </div>
+</div>
+
+<script>
+  import { createClient } from '@supabase/supabase-js';
+
+  const url = import.meta.env.PUBLIC_SUPABASE_URL;
+  const anon = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  const configured = url && anon && !url.includes('YOUR-PROJECT-REF');
+
+  const form = document.getElementById('contact-form');
+  const success = document.getElementById('form-success');
+  const errorMsg = document.getElementById('form-error');
+  const submitBtn = document.getElementById('cf-submit');
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorMsg.classList.add('hidden');
+
+      // Honeypot: silently "succeed" for bots without saving anything.
+      if (document.getElementById('cf-bot').value) {
+        form.classList.add('hidden');
+        success.classList.remove('hidden');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending…';
+      try {
+        if (!configured) throw new Error('Supabase not configured');
+        const supabase = createClient(url, anon);
+        const { error } = await supabase.from('messages').insert({
+          name: document.getElementById('name').value.trim(),
+          phone: document.getElementById('phone').value.trim(),
+          email: document.getElementById('email').value.trim() || null,
+          regarding: document.getElementById('regarding').value,
+          message: document.getElementById('message').value.trim() || null,
+        });
+        if (error) throw error;
+        form.classList.add('hidden');
+        success.classList.remove('hidden');
+        success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } catch (err) {
+        console.error('[contact] submit failed:', err);
+        errorMsg.classList.remove('hidden');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send message';
+      }
+    });
+  }
+</script>

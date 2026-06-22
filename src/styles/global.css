@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ----------------------------------------------------------------------------
+   Fonts: Fraunces (display) + Plus Jakarta Sans (body), loaded via Google Fonts
+   in Base.astro <head>. Tokens live in tailwind.config.mjs.
+---------------------------------------------------------------------------- */
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-ink text-cream font-body antialiased;
+    font-size: 1.0625rem;
+    line-height: 1.7;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display text-gold;
+    text-wrap: balance;
+  }
+
+  h1 { @apply text-h1 font-medium; }
+  h2 { @apply text-h2 font-medium; }
+  h3 { @apply text-h3 font-medium; }
+
+  a {
+    @apply transition-colors duration-200;
+  }
+
+  /* Visible, accessible keyboard focus — gold outline everywhere. */
+  :focus-visible {
+    outline: 2px solid theme('colors.gold');
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: theme('colors.gold');
+    color: theme('colors.ink');
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-content px-5 sm:px-6 lg:px-8;
+  }
+
+  .eyebrow {
+    @apply font-body text-caption font-semibold uppercase tracking-[0.18em] text-gold;
+  }
+
+  .lede {
+    @apply text-cream/90;
+    font-size: clamp(1.125rem, 2vw, 1.3rem);
+    line-height: 1.6;
+  }
+
+  /* Buttons --------------------------------------------------------------- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-btn font-body
+           font-semibold transition-all duration-200 px-6 py-3 text-base;
+    min-height: 44px;
+  }
+  .btn-primary {
+    @apply btn bg-gold text-ink hover:bg-gold-light hover:-translate-y-0.5
+           shadow-[0_8px_24px_-12px_rgba(201,162,75,0.7)];
+  }
+  .btn-secondary {
+    @apply btn border border-gold/60 text-gold hover:border-gold
+           hover:bg-gold/10 hover:-translate-y-0.5;
+  }
+
+  /* Cards ----------------------------------------------------------------- */
+  .card {
+    @apply rounded-card bg-charcoal border border-gold/10 transition-all duration-300;
+  }
+  .card-hover {
+    @apply hover:-translate-y-1 hover:border-gold/30
+           hover:shadow-[0_18px_40px_-24px_rgba(0,0,0,0.8)];
+  }
+
+  /* Thin gold hairline divider ------------------------------------------- */
+  .hairline {
+    @apply border-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent;
+  }
+
+  /* Scroll-reveal: starts hidden, .is-visible (set by IntersectionObserver) */
+  .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+    will-change: opacity, transform;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Respect users who prefer reduced motion ---------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .reveal { opacity: 1 !important; transform: none !important; }
+}

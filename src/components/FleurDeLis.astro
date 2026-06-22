@@ -1,0 +1,33 @@
+---
+/**
+ * The recurring brand motif. Reused for the logo, dividers, and watermark.
+ * Pass `decorative` (default true) so screen readers ignore it; set
+ * decorative={false} + a `title` when it carries meaning (e.g. the logo).
+ *
+ * TODO[CLIENT]: David has the official fleur-de-lis logo — swap this stylized
+ * placeholder SVG for the real artwork (keep the same viewBox / single-path
+ * fill so `currentColor` and sizing classes keep working).
+ */
+interface Props {
+  class?: string;
+  decorative?: boolean;
+  title?: string;
+}
+const { class: className = '', decorative = true, title } = Astro.props;
+---
+<svg
+  viewBox="0 0 64 64"
+  fill="currentColor"
+  class={className}
+  role={decorative ? 'presentation' : 'img'}
+  aria-hidden={decorative ? 'true' : undefined}
+  aria-label={!decorative ? title : undefined}
+  focusable="false"
+>
+  <path d="M32 4c-2.8 4.2-2.8 8.4 0 11.6 2.8-3.2 2.8-7.4 0-11.6z" />
+  <path d="M32 15c-3.6 2.3-5.6 5.9-5.6 9.8 0 4.3 2.5 7.6 5.6 10.1 3.1-2.5 5.6-5.8 5.6-10.1 0-3.9-2-7.5-5.6-9.8z" />
+  <path d="M19 23.5c-4.2 1.4-6.8 5.2-6.8 9.7 0 5.7 4.9 9.9 10.9 11.6-2.6-3.2-3.9-7-3.9-11 0-3.9 0-7.2-.2-10.3z" />
+  <path d="M45 23.5c4.2 1.4 6.8 5.2 6.8 9.7 0 5.7-4.9 9.9-10.9 11.6 2.6-3.2 3.9-7 3.9-11 0-3.9 0-7.2.2-10.3z" />
+  <rect x="19.5" y="38.2" width="25" height="3.6" rx="1.8" />
+  <path d="M32 40c-3.2 4.3-4.9 9.6-4.9 14.9 0 1.8 1.5 2.7 4.9 2.7s4.9-.9 4.9-2.7c0-5.3-1.7-10.6-4.9-14.9z" />
+</svg>

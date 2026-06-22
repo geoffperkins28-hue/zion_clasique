@@ -1,0 +1,25 @@
+---
+export const prerender = false; // live from Supabase
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Gallery from '../components/Gallery.astro';
+import CTABand from '../components/CTABand.astro';
+---
+<Base
+  title="Gallery"
+  description="See how residents at Zion Classique Care live, heal, and have fun — art, music, dance, recreation, community, and wellness activities in Chandler, AZ."
+>
+  <PageHeader
+    eyebrow="Gallery"
+    title="See how our residents live, heal, and have fun"
+    text="A look at the everyday moments — creativity, movement, community, and care — that make recovery feel human."
+  />
+
+  <section class="bg-ink">
+    <div class="container-page py-14 sm:py-20">
+      <Gallery />
+    </div>
+  </section>
+
+  <CTABand />
+</Base>

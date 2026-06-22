@@ -1,0 +1,28 @@
+---
+import FleurDeLis from './FleurDeLis.astro';
+import Icon from './Icon.astro';
+import { PRIMARY_PHONE, CONTACT } from '../config/site';
+interface Props {
+  heading?: string;
+  text?: string;
+}
+const {
+  heading = 'Ready to take the next step?',
+  text = 'One call is all it takes. Talk to a real person who can listen, answer your questions, and walk you through what comes next — no pressure, no judgment.',
+} = Astro.props;
+---
+<section class="relative overflow-hidden bg-charcoal">
+  <FleurDeLis class="pointer-events-none absolute -right-10 top-1/2 h-72 w-72 -translate-y-1/2 text-gold opacity-[0.05]" />
+  <div class="container-page relative py-16 text-center sm:py-20">
+    <FleurDeLis class="mx-auto mb-6 h-10 w-10 text-gold" />
+    <h2 class="text-h2">{heading}</h2>
+    <p class="lede mx-auto mt-4 max-w-2xl">{text}</p>
+    <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+      <a href={`tel:${PRIMARY_PHONE.tel}`} class="btn-primary w-full sm:w-auto">
+        <Icon name="phone" class="h-5 w-5" /> Call {PRIMARY_PHONE.label}
+      </a>
+      <a href="/contact" class="btn-secondary w-full sm:w-auto">Send us a message</a>
+    </div>
+    <p class="mt-5 text-caption text-sand">{CONTACT.hours}</p>
+  </div>
+</section>

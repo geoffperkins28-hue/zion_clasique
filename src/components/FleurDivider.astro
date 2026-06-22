@@ -1,0 +1,11 @@
+---
+import FleurDeLis from './FleurDeLis.astro';
+interface Props { class?: string; }
+const { class: className = '' } = Astro.props;
+---
+<!-- Section divider: hairline with a centered gold fleur-de-lis. -->
+<div class:list={['container-page flex items-center gap-5 py-2', className]} aria-hidden="true">
+  <span class="h-px flex-1 bg-gradient-to-r from-transparent to-gold/40"></span>
+  <FleurDeLis class="h-6 w-6 shrink-0 text-gold/80" />
+  <span class="h-px flex-1 bg-gradient-to-l from-transparent to-gold/40"></span>
+</div>

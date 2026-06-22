@@ -1,0 +1,127 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import FleurDivider from '../components/FleurDivider.astro';
+import ReviewCard from '../components/ReviewCard.astro';
+import CTABand from '../components/CTABand.astro';
+import Icon from '../components/Icon.astro';
+
+const reviews = (await getCollection('reviews')).slice(0, 6);
+
+const values = [
+  {
+    icon: 'heart',
+    title: 'Compassion first',
+    text: 'Every person who walks through our doors is treated with warmth, patience, and respect — never as a case number.',
+  },
+  {
+    icon: 'brain',
+    title: 'Individualized care',
+    text: 'No two recovery journeys are alike. We build each plan around the real person, their history, and their goals.',
+  },
+  {
+    icon: 'shield',
+    title: 'Trauma-informed',
+    text: 'We understand that healing requires safety. Our approach is gentle, steady, and grounded in evidence-based practice.',
+  },
+];
+---
+<Base
+  title="About Us"
+  description="Learn about Zion Classique Care & Human Services — a compassionate, trauma-informed behavioral health and substance-abuse facility serving adults across Arizona."
+>
+  <PageHeader
+    eyebrow="About us"
+    title="Care rooted in dignity"
+    text="We are more than a facility. We are a community committed to helping people rebuild their lives."
+  />
+
+  <!-- Story / mission -->
+  <section class="bg-ink">
+    <div class="container-page py-16 sm:py-20">
+      <div class="reveal mx-auto max-w-3xl space-y-6 text-cream/90">
+        <p class="lede text-cream">
+          Zion Classique Care &amp; Human Services is a behavioral health and
+          substance-abuse residential facility in Chandler, Arizona. We exist to
+          give adults a safe, dignified place to heal — and a clear path back to
+          the life they want.
+        </p>
+        <p>
+          Our work begins with listening. We take the time to understand each
+          person's story, their strengths, and the challenges they're facing, so
+          care never feels like a one-size-fits-all program. From there, we walk
+          alongside them through every phase of recovery, coordinating with
+          physicians, providers, and tribal services so the whole team is moving
+          in the same direction.
+        </p>
+        <p>
+          Recovery doesn't end when someone feels better — it ends when they can
+          thrive on their own. That's why we focus on long-term integration into
+          home, work, and community, building the skills, confidence, and
+          connections that make lasting change possible.
+        </p>
+      </div>
+    </div>
+    <FleurDivider />
+  </section>
+
+  <!-- Approach / values -->
+  <section class="bg-charcoal">
+    <div class="container-page py-16 sm:py-20">
+      <div class="reveal flex flex-col items-center text-center">
+        <span class="eyebrow">Our approach</span>
+        <h2 class="mt-3 text-h2">Why families choose us</h2>
+      </div>
+      <div class="mt-12 grid gap-6 md:grid-cols-3">
+        {values.map((v) => (
+          <article class="reveal card flex h-full flex-col p-7">
+            <span class="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-btn bg-gold/10 text-gold ring-1 ring-gold/20">
+              <Icon name={v.icon} class="h-6 w-6" />
+            </span>
+            <h3 class="text-h3">{v.title}</h3>
+            <p class="mt-2 text-cream/85">{v.text}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Who we serve -->
+  <section class="bg-ink">
+    <div class="container-page py-16 sm:py-20">
+      <div class="reveal mx-auto max-w-3xl text-center">
+        <span class="eyebrow">Who we serve</span>
+        <h2 class="mt-3 text-h2">Here for Arizona</h2>
+        <p class="lede mt-5">
+          We support adults across Arizona living with behavioral health
+          conditions and substance-use challenges. Whether you're a family
+          member, a case manager, or a referring clinician, we're ready to help
+          you find the right next step — with a focus on lasting recovery and a
+          dignified return to everyday life.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reviews band -->
+  {reviews.length > 0 && (
+    <section class="bg-charcoal">
+      <div class="container-page py-16 sm:py-20">
+        <div class="reveal flex flex-col items-center text-center">
+          <span class="eyebrow">In their words</span>
+          <h2 class="mt-3 text-h2">What people say</h2>
+        </div>
+        <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {reviews.map((r) => (
+            <div class="reveal h-full">
+              <ReviewCard name={r.data.name} relationship={r.data.relationship} rating={r.data.rating} quote={r.data.quote} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <CTABand />
+</Base>

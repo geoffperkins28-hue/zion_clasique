@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+
+# TODO[CLIENT]: confirm production domain matches astro.config.mjs `site`.
+Sitemap: https://zionclassiquecare.com/sitemap-index.xml

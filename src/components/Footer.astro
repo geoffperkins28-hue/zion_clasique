@@ -1,0 +1,66 @@
+---
+import FleurDeLis from './FleurDeLis.astro';
+import Logo from './Logo.astro';
+import { NAV, SITE, CONTACT, FULL_ADDRESS } from '../config/site';
+const year = new Date().getFullYear();
+const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(FULL_ADDRESS)}`;
+---
+<footer class="relative overflow-hidden border-t border-gold/15 bg-charcoal">
+  <!-- Warm glow background image, anchored to the bottom. -->
+  <img
+    src="/images/footer/glow.jpg"
+    alt=""
+    aria-hidden="true"
+    class="pointer-events-none absolute inset-0 h-full w-full object-cover object-bottom opacity-95"
+  />
+  <!-- Darken the top so the contact/nav text keeps strong contrast; let the glow emerge below. -->
+  <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-charcoal via-charcoal/60 to-charcoal/10"></div>
+
+  <!-- Faint oversized fleur-de-lis watermark -->
+  <FleurDeLis
+    class="pointer-events-none absolute -bottom-16 right-0 h-72 w-72 text-gold opacity-[0.06] sm:h-96 sm:w-96"
+  />
+
+  <div class="container-page relative grid gap-10 py-14 md:grid-cols-3 md:py-16">
+    <!-- Contact block -->
+    <div>
+      <div class="mb-4 flex items-center gap-3">
+        <Logo class="h-9 w-auto" />
+        <span class="font-display text-xl text-cream">Zion Classique <span class="text-gold">Care</span></span>
+      </div>
+      <address class="not-italic text-cream/85">
+        <a href={mapsHref} target="_blank" rel="noopener" class="hover:text-gold">{FULL_ADDRESS}</a>
+        <div class="mt-3 flex flex-col gap-1">
+          {CONTACT.phones.map((p) => (
+            <a href={`tel:${p.tel}`} class="hover:text-gold">{p.label}</a>
+          ))}
+          <a href={`mailto:${CONTACT.email}`} class="mt-1 hover:text-gold">{CONTACT.email}</a>
+        </div>
+      </address>
+    </div>
+
+    <!-- Quick nav -->
+    <nav class="md:justify-self-center" aria-label="Footer">
+      <h2 class="eyebrow mb-4">Explore</h2>
+      <ul class="flex flex-col gap-2">
+        {NAV.map((item) => (
+          <li><a href={item.href} class="text-cream/85 hover:text-gold">{item.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <!-- Tagline -->
+    <div class="md:justify-self-end md:text-right">
+      <p class="font-display text-2xl text-gold">{SITE.tagline}</p>
+      <p class="mt-3 text-cream/85">{CONTACT.hours}</p>
+    </div>
+  </div>
+
+  <div class="container-page relative">
+    <hr class="hairline" />
+    <div class="flex flex-col items-center justify-between gap-2 py-6 text-caption text-sand sm:flex-row">
+      <p>© {year} {SITE.name}. All rights reserved.</p>
+      <p class="text-gold/90">Available 24/7</p>
+    </div>
+  </div>
+</footer>

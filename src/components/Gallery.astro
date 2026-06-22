@@ -1,0 +1,181 @@
+---
+import { getGalleryItems } from '../lib/content';
+
+const galleryItems = await getGalleryItems();
+
+// Canonical order; only show pills for categories that actually have photos.
+const CATEGORY_ORDER = ['art', 'music', 'dance', 'recreation', 'community', 'wellness', 'events'] as const;
+const present = new Set(galleryItems.map((i) => i.category));
+const categories = ['all', ...CATEGORY_ORDER.filter((c) => present.has(c))];
+
+const items = galleryItems.map((i) => ({ ...i, src: i.image_url }));
+---
+<!-- Filter bar -->
+<div
+  id="gallery-filter"
+  class="flex flex-wrap justify-center gap-2 sm:gap-3"
+  role="group"
+  aria-label="Filter gallery by activity"
+>
+  {categories.map((cat, i) => (
+    <button
+      type="button"
+      class="filter-pill rounded-full border border-gold/50 px-4 py-2 text-caption font-semibold capitalize transition-colors min-h-[44px]"
+      data-filter={cat}
+      aria-pressed={i === 0 ? 'true' : 'false'}
+    >
+      {cat}
+    </button>
+  ))}
+</div>
+
+<!-- Grid -->
+<ul id="gallery-grid" class="mt-10 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+  {items.map((item, i) => (
+    <li class="gallery-item" data-category={item.category}>
+      <button
+        type="button"
+        class="group block w-full overflow-hidden rounded-card border border-gold/10 focus-visible:outline-none"
+        data-index={i}
+        data-full={item.src}
+        data-alt={item.alt}
+        data-caption={item.caption ?? ''}
+        aria-label={`View larger: ${item.alt}`}
+      >
+        <img
+          src={item.src}
+          alt={item.alt}
+          width="600"
+          height="450"
+          loading="lazy"
+          class="aspect-[4/3] h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+      </button>
+    </li>
+  ))}
+</ul>
+
+<p id="gallery-empty" class="mt-10 hidden text-center text-sand">No photos in this category yet.</p>
+
+<!-- Lightbox -->
+<div
+  id="lightbox"
+  class="fixed inset-0 z-[60] hidden items-center justify-center bg-ink/95 p-4 backdrop-blur"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Image viewer"
+>
+  <button id="lb-close" class="absolute right-4 top-4 inline-flex h-12 w-12 items-center justify-center rounded-full text-gold hover:bg-gold/10" aria-label="Close">
+    <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+  </button>
+  <button id="lb-prev" class="absolute left-2 top-1/2 inline-flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full text-gold hover:bg-gold/10 sm:left-6" aria-label="Previous image">
+    <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <button id="lb-next" class="absolute right-2 top-1/2 inline-flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full text-gold hover:bg-gold/10 sm:right-6" aria-label="Next image">
+    <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <figure class="flex max-h-full max-w-4xl flex-col items-center">
+    <img id="lb-img" src="" alt="" class="max-h-[80vh] w-auto rounded-card object-contain" />
+    <figcaption id="lb-caption" class="mt-3 text-center text-caption text-sand"></figcaption>
+  </figure>
+</div>
+
+<style>
+  .filter-pill[aria-pressed='true'] {
+    background-color: theme('colors.gold');
+    color: theme('colors.ink');
+    border-color: theme('colors.gold');
+  }
+  .filter-pill[aria-pressed='false'] {
+    color: theme('colors.gold');
+  }
+  .filter-pill[aria-pressed='false']:hover {
+    background-color: rgb(201 162 75 / 0.1);
+  }
+  .gallery-item.is-hidden { display: none; }
+</style>
+
+<script is:inline>
+  (function () {
+    // ---- Filtering ----
+    const pills = Array.from(document.querySelectorAll('.filter-pill'));
+    const items = Array.from(document.querySelectorAll('.gallery-item'));
+    const empty = document.getElementById('gallery-empty');
+
+    function applyFilter(filter) {
+      let visible = 0;
+      items.forEach((item) => {
+        const match = filter === 'all' || item.dataset.category === filter;
+        item.classList.toggle('is-hidden', !match);
+        if (match) visible++;
+      });
+      empty.classList.toggle('hidden', visible > 0);
+    }
+    pills.forEach((pill) => {
+      pill.addEventListener('click', () => {
+        pills.forEach((p) => p.setAttribute('aria-pressed', 'false'));
+        pill.setAttribute('aria-pressed', 'true');
+        applyFilter(pill.dataset.filter);
+      });
+    });
+
+    // ---- Lightbox ----
+    const triggers = Array.from(document.querySelectorAll('[data-full]'));
+    const lb = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lb-img');
+    const lbCap = document.getElementById('lb-caption');
+    const btnClose = document.getElementById('lb-close');
+    const btnPrev = document.getElementById('lb-prev');
+    const btnNext = document.getElementById('lb-next');
+    let current = 0;
+    let lastFocused = null;
+
+    function visibleTriggers() {
+      return triggers.filter((t) => !t.closest('.gallery-item').classList.contains('is-hidden'));
+    }
+    function show(index) {
+      const list = visibleTriggers();
+      if (!list.length) return;
+      current = (index + list.length) % list.length;
+      const t = list[current];
+      lbImg.src = t.dataset.full;
+      lbImg.alt = t.dataset.alt;
+      lbCap.textContent = t.dataset.caption || '';
+    }
+    function open(trigger) {
+      lastFocused = document.activeElement;
+      const list = visibleTriggers();
+      show(list.indexOf(trigger));
+      lb.classList.remove('hidden');
+      lb.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+      btnClose.focus();
+    }
+    function close() {
+      lb.classList.add('hidden');
+      lb.classList.remove('flex');
+      document.body.style.overflow = '';
+      if (lastFocused) lastFocused.focus();
+    }
+    triggers.forEach((t) => t.addEventListener('click', () => open(t)));
+    btnClose.addEventListener('click', close);
+    btnPrev.addEventListener('click', () => show(current - 1));
+    btnNext.addEventListener('click', () => show(current + 1));
+    lb.addEventListener('click', (e) => { if (e.target === lb) close(); });
+
+    document.addEventListener('keydown', (e) => {
+      if (lb.classList.contains('hidden')) return;
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowLeft') show(current - 1);
+      else if (e.key === 'ArrowRight') show(current + 1);
+      else if (e.key === 'Tab') {
+        // Simple focus trap across the lightbox controls.
+        const focusable = [btnClose, btnPrev, btnNext];
+        const idx = focusable.indexOf(document.activeElement);
+        e.preventDefault();
+        const dir = e.shiftKey ? -1 : 1;
+        focusable[(idx + dir + focusable.length) % focusable.length].focus();
+      }
+    });
+  })();
+</script>

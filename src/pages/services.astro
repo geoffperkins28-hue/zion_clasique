@@ -1,0 +1,60 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import FleurDivider from '../components/FleurDivider.astro';
+import CTABand from '../components/CTABand.astro';
+import { CORE_SERVICES, NON_TRADITIONAL_THERAPIES } from '../config/services';
+---
+<Base
+  title="Services"
+  description="Comprehensive behavioral health and substance-abuse services in Chandler, AZ — care coordination, counseling, life-skills training, plus art, music, and movement therapies."
+>
+  <PageHeader
+    eyebrow="Our services"
+    title="A full circle of care"
+    text="Clinical expertise and human warmth, working together. Every service is here to help recovery take root and last."
+  />
+
+  <!-- Core services -->
+  <section class="bg-ink">
+    <div class="container-page py-16 sm:py-20">
+      <div class="reveal max-w-2xl">
+        <h2 class="text-h2">Core services</h2>
+        <p class="lede mt-4">
+          The clinical foundation of recovery — coordinated, evidence-based, and
+          tailored to each person.
+        </p>
+      </div>
+      <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {CORE_SERVICES.map((s) => (
+          <div class="reveal h-full"><ServiceCard icon={s.icon} title={s.title} description={s.description} /></div>
+        ))}
+      </div>
+    </div>
+    <FleurDivider />
+  </section>
+
+  <!-- Non-traditional therapies -->
+  <section class="bg-charcoal">
+    <div class="container-page py-16 sm:py-20">
+      <div class="reveal max-w-2xl">
+        <h2 class="text-h2">Non-traditional therapies</h2>
+        <p class="lede mt-4">
+          Healing isn't only clinical. These creative and active therapies help
+          people reconnect with themselves and find joy along the way.
+        </p>
+      </div>
+      <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {NON_TRADITIONAL_THERAPIES.map((s) => (
+          <div class="reveal h-full"><ServiceCard icon={s.icon} title={s.title} description={s.description} /></div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CTABand
+    heading="Not sure which services fit?"
+    text="That's what we're here for. Call us and we'll help you understand the options and find the right path — for you or your loved one."
+  />
+</Base>

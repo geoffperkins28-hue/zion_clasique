@@ -1,0 +1,57 @@
+---
+export const prerender = false; // live from Supabase
+import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import CTABand from '../../components/CTABand.astro';
+import { getPublishedPosts } from '../../lib/content';
+
+const posts = await getPublishedPosts();
+
+const fmtDate = (d?: string | null) =>
+  d ? new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+---
+<Base
+  title="News & Events"
+  description="News and events from Zion Classique Care & Human Services in Chandler, Arizona — community activities, milestones, and updates."
+>
+  <PageHeader
+    eyebrow="News & events"
+    title="What's happening at Zion Classique"
+    text="Milestones, activities, and the moments that make our community special."
+  />
+
+  <section class="bg-ink">
+    <div class="container-page py-16 sm:py-20">
+      {posts.length === 0 ? (
+        <p class="text-center text-sand">No posts yet — check back soon.</p>
+      ) : (
+        <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {posts.map((post) => (
+            <article class="card card-hover flex h-full flex-col overflow-hidden">
+              <a href={`/blog/${post.slug}`} class="flex h-full flex-col">
+                {post.cover_url && (
+                  <img
+                    src={post.cover_url}
+                    alt={post.title}
+                    loading="lazy"
+                    class="aspect-[16/9] w-full object-cover"
+                  />
+                )}
+                <div class="flex flex-1 flex-col p-6">
+                  {post.published_at && (
+                    <time class="text-caption text-sand" datetime={post.published_at}>{fmtDate(post.published_at)}</time>
+                  )}
+                  <h2 class="mt-1 text-h3">{post.title}</h2>
+                  {post.excerpt && <p class="mt-2 flex-1 text-cream/85">{post.excerpt}</p>}
+                  <span class="mt-4 font-semibold text-gold">Read more →</span>
+                </div>
+              </a>
+            </article>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+
+  <CTABand />
+</Base>

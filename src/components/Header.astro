@@ -1,0 +1,141 @@
+---
+import Logo from './Logo.astro';
+import { NAV, SITE, PRIMARY_PHONE } from '../config/site';
+
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path.startsWith(href);
+---
+<header
+  id="site-header"
+  class="sticky top-0 z-50 border-b border-gold/10 bg-ink/85 backdrop-blur-md transition-all duration-300"
+>
+  <div class="container-page flex items-center justify-between gap-4 py-4 transition-all duration-300" id="header-inner">
+    <!-- Logo / wordmark -->
+    <a href="/" class="group flex items-center gap-3" aria-label={`${SITE.shortName} — home`}>
+      <Logo class="h-10 w-auto transition-transform duration-300 group-hover:scale-105" />
+      <span class="font-display text-lg font-medium leading-tight text-cream sm:text-xl">
+        Zion Classique <span class="text-gold">Care</span>
+      </span>
+    </a>
+
+    <!-- Desktop nav -->
+    <nav class="hidden items-center gap-7 lg:flex" aria-label="Primary">
+      {NAV.map((item) => (
+        <a
+          href={item.href}
+          class:list={[
+            'font-body text-[0.95rem] font-medium transition-colors hover:text-gold',
+            isActive(item.href) ? 'text-gold' : 'text-cream/85',
+          ]}
+          aria-current={isActive(item.href) ? 'page' : undefined}
+        >
+          {item.label}
+        </a>
+      ))}
+      <a href={`tel:${PRIMARY_PHONE.tel}`} class="btn-primary">
+        Call us today
+      </a>
+    </nav>
+
+    <!-- Mobile hamburger -->
+    <button
+      id="menu-toggle"
+      class="inline-flex h-11 w-11 items-center justify-center rounded-btn text-gold lg:hidden"
+      aria-label="Open menu"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+    >
+      <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Mobile full-screen overlay -->
+  <div
+    id="mobile-menu"
+    class="fixed inset-0 z-50 hidden flex-col bg-ink lg:hidden"
+  >
+    <div class="container-page flex items-center justify-between py-4">
+      <span class="font-display text-lg text-cream">Zion Classique <span class="text-gold">Care</span></span>
+      <button
+        id="menu-close"
+        class="inline-flex h-11 w-11 items-center justify-center rounded-btn text-gold"
+        aria-label="Close menu"
+      >
+        <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <line x1="6" y1="6" x2="18" y2="18" /><line x1="18" y1="6" x2="6" y2="18" />
+        </svg>
+      </button>
+    </div>
+    <nav class="container-page flex flex-1 flex-col justify-center gap-2 pb-24" aria-label="Mobile">
+      {NAV.map((item) => (
+        <a
+          href={item.href}
+          class:list={[
+            'border-b border-gold/10 py-4 font-display text-3xl transition-colors',
+            isActive(item.href) ? 'text-gold' : 'text-cream hover:text-gold',
+          ]}
+          aria-current={isActive(item.href) ? 'page' : undefined}
+        >
+          {item.label}
+        </a>
+      ))}
+      <a href={`tel:${PRIMARY_PHONE.tel}`} class="btn-primary mt-8 w-full text-lg">
+        Call us today · {PRIMARY_PHONE.label}
+      </a>
+    </nav>
+  </div>
+</header>
+
+<script is:inline>
+  (function () {
+    const toggle = document.getElementById('menu-toggle');
+    const close = document.getElementById('menu-close');
+    const menu = document.getElementById('mobile-menu');
+    const header = document.getElementById('site-header');
+    const inner = document.getElementById('header-inner');
+
+    function openMenu() {
+      menu.classList.remove('hidden');
+      menu.classList.add('flex');
+      toggle.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+      const first = menu.querySelector('a, button');
+      if (first) first.focus();
+    }
+    function closeMenu() {
+      menu.classList.add('hidden');
+      menu.classList.remove('flex');
+      toggle.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+      toggle.focus();
+    }
+    if (toggle && menu) {
+      toggle.addEventListener('click', openMenu);
+      close.addEventListener('click', closeMenu);
+      menu.addEventListener('click', (e) => {
+        if (e.target.tagName === 'A') closeMenu();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !menu.classList.contains('hidden')) closeMenu();
+      });
+    }
+
+    // Condense header slightly on scroll.
+    let ticking = false;
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const condensed = window.scrollY > 24;
+        inner.classList.toggle('py-2', condensed);
+        inner.classList.toggle('py-4', !condensed);
+        header.classList.toggle('shadow-[0_8px_30px_-18px_rgba(0,0,0,0.9)]', condensed);
+        ticking = false;
+      });
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+  })();
+</script>

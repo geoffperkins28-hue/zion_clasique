@@ -1,0 +1,185 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import FleurDivider from '../components/FleurDivider.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import ReviewCard from '../components/ReviewCard.astro';
+import CTABand from '../components/CTABand.astro';
+import Icon from '../components/Icon.astro';
+import { CORE_SERVICES } from '../config/services';
+import { getGalleryItems, getPublishedPosts } from '../lib/content';
+
+const featuredServices = CORE_SERVICES.filter((s) => s.featured).slice(0, 4);
+
+const reviews = (await getCollection('reviews'))
+  .filter((r) => r.data.featured)
+  .slice(0, 3);
+
+const galleryEntries = (await getGalleryItems()).slice(0, 6);
+
+const latestPosts = (await getPublishedPosts()).slice(0, 3);
+const NEWS_FALLBACK_IMG = '/images/gallery/community-1.jpg';
+const fmtDate = (d?: string | null) =>
+  d ? new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+
+const supportPoints = [
+  'You are watching someone you love struggle, and you are not sure where to turn.',
+  'You want a place that treats people with dignity — not just a bed and a schedule.',
+  'You are ready for real, individualized care that helps recovery actually last.',
+];
+---
+<Base
+  title="Zion Classique Care & Human Services"
+  description="A warm, dignified behavioral health and substance-abuse residential facility in Chandler, Arizona. Individualized, evidence-based care. Call us today — we're here 24/7."
+>
+  <Hero />
+
+  <!-- Intro / mission -->
+  <section class="bg-ink">
+    <div class="container-page py-16 sm:py-20">
+      <div class="reveal mx-auto max-w-3xl text-center">
+        <span class="eyebrow">Our mission</span>
+        <p class="mt-5 font-display text-h3 leading-relaxed text-cream">
+          At Zion Classique Care, we believe healing happens when people feel
+          safe, seen, and supported. We provide compassionate, individualized
+          care for adults navigating behavioral health and substance-abuse
+          recovery — helping them return to home, work, and community with
+          dignity and hope.
+        </p>
+      </div>
+    </div>
+    <FleurDivider />
+  </section>
+
+  <!-- Is this the right place for you? -->
+  <section class="bg-charcoal">
+    <div class="container-page py-16 sm:py-20">
+      <div class="reveal mx-auto max-w-2xl text-center">
+        <h2 class="text-h2">Is this the right place for your family?</h2>
+        <p class="lede mt-4">
+          If any of this sounds familiar, you are exactly who we are here for.
+        </p>
+      </div>
+      <ul class="mx-auto mt-10 grid max-w-4xl gap-4 md:grid-cols-3">
+        {supportPoints.map((point) => (
+          <li class="reveal card flex items-start gap-3 p-6">
+            <Icon name="check" class="mt-0.5 h-6 w-6 shrink-0 text-gold" />
+            <span class="text-cream/90">{point}</span>
+          </li>
+        ))}
+      </ul>
+      <div class="reveal mt-10 text-center">
+        <a href="/contact" class="btn-primary">Let's talk it through</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services preview -->
+  <section class="bg-ink">
+    <div class="container-page py-16 sm:py-20">
+      <div class="reveal flex flex-col items-center text-center">
+        <span class="eyebrow">What we offer</span>
+        <h2 class="mt-3 text-h2">Care built around the whole person</h2>
+        <p class="lede mt-4 max-w-2xl">
+          From coordinated medical care to counseling and life-skills support,
+          every service works together toward lasting recovery.
+        </p>
+      </div>
+      <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {featuredServices.map((s) => (
+          <div class="reveal h-full"><ServiceCard icon={s.icon} title={s.title} description={s.description} /></div>
+        ))}
+      </div>
+      <div class="reveal mt-10 text-center">
+        <a href="/services" class="btn-secondary">See all services</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured reviews -->
+  {reviews.length > 0 && (
+    <section class="bg-charcoal">
+      <div class="container-page py-16 sm:py-20">
+        <div class="reveal flex flex-col items-center text-center">
+          <span class="eyebrow">In their words</span>
+          <h2 class="mt-3 text-h2">Families and clients who trusted us</h2>
+        </div>
+        <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {reviews.map((r) => (
+            <div class="reveal h-full">
+              <ReviewCard name={r.data.name} relationship={r.data.relationship} rating={r.data.rating} quote={r.data.quote} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Gallery teaser -->
+  <section id="gallery-teaser" class="scroll-mt-24 bg-ink">
+    <div class="container-page py-16 sm:py-20">
+      <div class="reveal flex flex-col items-center text-center">
+        <span class="eyebrow">A glimpse inside</span>
+        <h2 class="mt-3 text-h2">Where residents live, heal, and have fun</h2>
+      </div>
+      <div class="mt-12 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
+        {galleryEntries.map((item) => (
+          <div class="reveal overflow-hidden rounded-card border border-gold/10">
+            <img
+              src={item.image_url}
+              alt={item.alt}
+              width="600"
+              height="450"
+              loading="lazy"
+              class="aspect-[4/3] h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+            />
+          </div>
+        ))}
+      </div>
+      <div class="reveal mt-10 text-center">
+        <a href="/gallery" class="btn-secondary">See more</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- News & events -->
+  {latestPosts.length > 0 && (
+    <section class="bg-charcoal">
+      <div class="container-page py-16 sm:py-20">
+        <div class="reveal flex flex-col items-center text-center">
+          <span class="eyebrow">News & events</span>
+          <h2 class="mt-3 text-h2">The latest from Zion Classique</h2>
+          <p class="lede mt-4 max-w-2xl">Milestones, activities, and moments from our community.</p>
+        </div>
+        <div class="mt-12 grid gap-6 md:grid-cols-3">
+          {latestPosts.map((post) => (
+            <article class="reveal card card-hover flex h-full flex-col overflow-hidden">
+              <a href={`/blog/${post.slug}`} class="flex h-full flex-col">
+                <img
+                  src={post.cover_url || NEWS_FALLBACK_IMG}
+                  alt={post.title}
+                  loading="lazy"
+                  class="aspect-[16/9] w-full object-cover"
+                />
+                <div class="flex flex-1 flex-col p-6">
+                  {post.published_at && (
+                    <time class="text-caption text-sand" datetime={post.published_at}>{fmtDate(post.published_at)}</time>
+                  )}
+                  <h3 class="mt-1 text-h3">{post.title}</h3>
+                  {post.excerpt && <p class="mt-2 flex-1 text-cream/85">{post.excerpt}</p>}
+                  <span class="mt-4 font-semibold text-gold">Read more →</span>
+                </div>
+              </a>
+            </article>
+          ))}
+        </div>
+        <div class="reveal mt-10 text-center">
+          <a href="/blog" class="btn-secondary">See all news</a>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <CTABand />
+</Base>

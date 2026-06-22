@@ -1,0 +1,448 @@
+---
+export const prerender = false;
+import '../../styles/global.css';
+import { supabaseConfigured } from '../../lib/supabase';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Owner Dashboard · Zion Classique Care</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" />
+  </head>
+  <body class="min-h-screen bg-ink text-cream">
+    {!supabaseConfigured && (
+      <div class="container-page py-20 text-center">
+        <h1 class="text-h2">Dashboard not connected yet</h1>
+        <p class="lede mx-auto mt-4 max-w-xl">
+          Add your Supabase keys to the <code class="text-gold">.env</code> file
+          (PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_ANON_KEY), then restart the dev
+          server. See the README for the full setup steps.
+        </p>
+      </div>
+    )}
+
+    {supabaseConfigured && (
+      <main>
+        <!-- LOGIN -->
+        <section id="login-view" class="hidden">
+          <div class="container-page flex min-h-screen items-center justify-center py-16">
+            <form id="login-form" class="card w-full max-w-sm p-8">
+              <h1 class="text-center font-display text-2xl text-gold">Owner sign in</h1>
+              <p class="mt-1 text-center text-caption text-sand">Zion Classique Care dashboard</p>
+              <label class="mt-6 block text-caption font-semibold" for="email">Email</label>
+              <input id="email" type="email" autocomplete="username" required class="mt-1 w-full rounded-btn border border-gold/20 bg-ink px-4 py-3 text-cream focus:border-gold focus:outline-none" />
+              <label class="mt-4 block text-caption font-semibold" for="password">Password</label>
+              <input id="password" type="password" autocomplete="current-password" required class="mt-1 w-full rounded-btn border border-gold/20 bg-ink px-4 py-3 text-cream focus:border-gold focus:outline-none" />
+              <button type="submit" class="btn-primary mt-6 w-full">Sign in</button>
+              <p id="login-error" class="mt-3 hidden text-center text-caption text-red-300"></p>
+            </form>
+          </div>
+        </section>
+
+        <!-- DASHBOARD -->
+        <section id="dash-view" class="hidden">
+          <header class="sticky top-0 z-10 border-b border-gold/15 bg-ink/90 backdrop-blur">
+            <div class="container-page flex items-center justify-between py-4">
+              <div class="flex items-center gap-3">
+                <img src="/images/logo/logo.png" alt="" class="h-8 w-auto" />
+                <span class="font-display text-lg">Owner dashboard</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <a href="/" class="text-caption text-sand hover:text-gold" target="_blank">View site ↗</a>
+                <button id="logout-btn" class="btn-secondary px-4 py-2 text-caption">Sign out</button>
+              </div>
+            </div>
+            <div class="container-page flex gap-2 pb-3">
+              <button data-tab="gallery" class="tab-btn rounded-btn px-4 py-2 text-caption font-semibold">Gallery</button>
+              <button data-tab="blog" class="tab-btn rounded-btn px-4 py-2 text-caption font-semibold">News &amp; events</button>
+              <button data-tab="messages" class="tab-btn rounded-btn px-4 py-2 text-caption font-semibold">
+                Messages <span id="msg-badge" class="ml-1 hidden rounded-full bg-gold px-1.5 text-[0.7rem] text-ink"></span>
+              </button>
+            </div>
+          </header>
+
+          <div class="container-page py-8">
+            <!-- GALLERY PANEL -->
+            <div id="panel-gallery" class="tab-panel">
+              <div class="card p-6">
+                <h2 class="text-h3">Add a photo</h2>
+                <p class="mt-1 text-caption text-sand">Upload event and activity photos. They appear on the gallery page instantly.</p>
+                <form id="gallery-form" class="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div class="sm:col-span-2">
+                    <label class="block text-caption font-semibold">Photo file</label>
+                    <input id="g-file" type="file" accept="image/*" required class="mt-1 w-full text-caption text-sand file:mr-3 file:rounded-btn file:border-0 file:bg-gold file:px-4 file:py-2 file:font-semibold file:text-ink" />
+                  </div>
+                  <div>
+                    <label class="block text-caption font-semibold">Category</label>
+                    <select id="g-category" class="mt-1 w-full rounded-btn border border-gold/20 bg-ink px-4 py-2.5 text-cream focus:border-gold focus:outline-none">
+                      <option value="events">Events</option>
+                      <option value="community">Community</option>
+                      <option value="wellness">Wellness</option>
+                      <option value="art">Art</option>
+                      <option value="music">Music</option>
+                      <option value="dance">Dance</option>
+                      <option value="recreation">Recreation</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-caption font-semibold">Display order</label>
+                    <input id="g-order" type="number" value="0" class="mt-1 w-full rounded-btn border border-gold/20 bg-ink px-4 py-2.5 text-cream focus:border-gold focus:outline-none" />
+                  </div>
+                  <div class="sm:col-span-2">
+                    <label class="block text-caption font-semibold">Description (alt text) <span class="text-gold">*</span></label>
+                    <input id="g-alt" type="text" required placeholder="e.g. Residents enjoying a summer barbecue" class="mt-1 w-full rounded-btn border border-gold/20 bg-ink px-4 py-2.5 text-cream placeholder:text-sand/50 focus:border-gold focus:outline-none" />
+                  </div>
+                  <div class="sm:col-span-2">
+                    <label class="block text-caption font-semibold">Caption (optional)</label>
+                    <input id="g-caption" type="text" class="mt-1 w-full rounded-btn border border-gold/20 bg-ink px-4 py-2.5 text-cream focus:border-gold focus:outline-none" />
+                  </div>
+                  <div class="sm:col-span-2 flex items-center gap-3">
+                    <button type="submit" class="btn-primary">Upload photo</button>
+                    <span id="g-status" class="text-caption text-sand"></span>
+                  </div>
+                </form>
+              </div>
+
+              <h2 class="mt-8 text-h3">Current photos</h2>
+              <div id="gallery-list" class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+            </div>
+
+            <!-- BLOG PANEL -->
+            <div id="panel-blog" class="tab-panel hidden">
+              <div class="flex items-center justify-between">
+                <h2 class="text-h3">Posts</h2>
+                <button id="new-post-btn" class="btn-primary px-4 py-2 text-caption">+ New post</button>
+              </div>
+              <div id="post-list" class="mt-4 space-y-3"></div>
+
+              <!-- Editor -->
+              <div id="post-editor" class="card mt-6 hidden p-6">
+                <h3 id="editor-title" class="text-h3">New post</h3>
+                <form id="post-form" class="mt-4 space-y-4">
+                  <input type="hidden" id="p-id" />
+                  <div>
+                    <label class="block text-caption font-semibold">Title <span class="text-gold">*</span></label>
+                    <input id="p-title" type="text" required class="mt-1 w-full rounded-btn border border-gold/20 bg-ink px-4 py-2.5 text-cream focus:border-gold focus:outline-none" />
+                  </div>
+                  <div>
+                    <label class="block text-caption font-semibold">URL slug</label>
+                    <input id="p-slug" type="text" class="mt-1 w-full rounded-btn border border-gold/20 bg-ink px-4 py-2.5 text-cream focus:border-gold focus:outline-none" />
+                    <p class="mt-1 text-caption text-sand">The web address: /blog/<span id="slug-preview">your-slug</span></p>
+                  </div>
+                  <div>
+                    <label class="block text-caption font-semibold">Cover image</label>
+                    <input id="p-cover-file" type="file" accept="image/*" class="mt-1 w-full text-caption text-sand file:mr-3 file:rounded-btn file:border-0 file:bg-gold file:px-4 file:py-2 file:font-semibold file:text-ink" />
+                    <img id="p-cover-preview" class="mt-2 hidden max-h-40 rounded-card" />
+                    <input type="hidden" id="p-cover-url" />
+                  </div>
+                  <div>
+                    <label class="block text-caption font-semibold">Short summary</label>
+                    <textarea id="p-excerpt" rows="2" class="mt-1 w-full rounded-btn border border-gold/20 bg-ink px-4 py-2.5 text-cream focus:border-gold focus:outline-none"></textarea>
+                  </div>
+                  <div>
+                    <label class="block text-caption font-semibold">Body</label>
+                    <p class="text-caption text-sand">Plain text. Leave a blank line between paragraphs. <code class="text-gold">**bold**</code>, <code class="text-gold">[link](https://...)</code>, and <code class="text-gold">- bullet</code> lists work.</p>
+                    <textarea id="p-body" rows="12" class="mt-1 w-full rounded-btn border border-gold/20 bg-ink px-4 py-2.5 font-mono text-sm text-cream focus:border-gold focus:outline-none"></textarea>
+                  </div>
+                  <label class="flex items-center gap-2">
+                    <input id="p-published" type="checkbox" class="h-4 w-4 accent-[#C9A24B]" />
+                    <span class="text-caption font-semibold">Published (visible on the site)</span>
+                  </label>
+                  <div class="flex items-center gap-3">
+                    <button type="submit" class="btn-primary">Save post</button>
+                    <button type="button" id="cancel-post" class="btn-secondary">Cancel</button>
+                    <span id="p-status" class="text-caption text-sand"></span>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- MESSAGES PANEL -->
+            <div id="panel-messages" class="tab-panel hidden">
+              <h2 class="text-h3">Contact form messages</h2>
+              <p class="mt-1 text-caption text-sand">Inquiries from the website contact form. Reach out, then mark as handled.</p>
+              <div id="message-list" class="mt-4 space-y-3"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    )}
+
+    <style>
+      .tab-btn { color: theme('colors.sand'); border: 1px solid transparent; }
+      .tab-btn[aria-selected='true'] { background: theme('colors.gold'); color: theme('colors.ink'); }
+    </style>
+
+    <script>
+      import { createClient } from '@supabase/supabase-js';
+      const supabase = createClient(
+        import.meta.env.PUBLIC_SUPABASE_URL,
+        import.meta.env.PUBLIC_SUPABASE_ANON_KEY
+      );
+
+      const $ = (id) => document.getElementById(id);
+      const loginView = $('login-view');
+      const dashView = $('dash-view');
+
+      // ---------- Auth ----------
+      async function refreshAuth() {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          loginView.classList.add('hidden');
+          dashView.classList.remove('hidden');
+          loadGallery();
+          loadPosts();
+          loadMessages();
+        } else {
+          dashView.classList.add('hidden');
+          loginView.classList.remove('hidden');
+        }
+      }
+
+      $('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const err = $('login-error');
+        err.classList.add('hidden');
+        const { error } = await supabase.auth.signInWithPassword({
+          email: $('email').value.trim(),
+          password: $('password').value,
+        });
+        if (error) { err.textContent = error.message; err.classList.remove('hidden'); }
+        else refreshAuth();
+      });
+
+      $('logout-btn').addEventListener('click', async () => {
+        await supabase.auth.signOut();
+        refreshAuth();
+      });
+
+      // ---------- Tabs ----------
+      const tabs = document.querySelectorAll('.tab-btn');
+      function selectTab(name) {
+        tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.tab === name)));
+        $('panel-gallery').classList.toggle('hidden', name !== 'gallery');
+        $('panel-blog').classList.toggle('hidden', name !== 'blog');
+        $('panel-messages').classList.toggle('hidden', name !== 'messages');
+      }
+      tabs.forEach((t) => t.addEventListener('click', () => selectTab(t.dataset.tab)));
+      selectTab('gallery');
+
+      // ---------- Helpers ----------
+      const esc = (s) => (s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      const slugify = (s) => s.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+      async function uploadTo(bucket, file) {
+        const ext = file.name.split('.').pop();
+        const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const { error } = await supabase.storage.from(bucket).upload(path, file, { cacheControl: '3600', upsert: false });
+        if (error) throw error;
+        return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl;
+      }
+
+      // ---------- Gallery ----------
+      async function loadGallery() {
+        const list = $('gallery-list');
+        const { data, error } = await supabase.from('gallery_images').select('*').order('sort_order', { ascending: true });
+        if (error) { list.innerHTML = `<p class="text-red-300 text-caption">${esc(error.message)}</p>`; return; }
+        list.innerHTML = (data || []).map((g) => `
+          <div class="card overflow-hidden">
+            <img src="${esc(g.image_url)}" alt="${esc(g.alt)}" class="aspect-[4/3] w-full object-cover" />
+            <div class="p-4">
+              <div class="flex items-center justify-between gap-2">
+                <span class="rounded-full bg-gold/15 px-2 py-0.5 text-caption font-semibold text-gold capitalize">${esc(g.category)}</span>
+                <span class="text-caption text-sand">#${g.sort_order}</span>
+              </div>
+              <p class="mt-2 text-caption text-cream/85">${esc(g.caption || g.alt)}</p>
+              <button data-del="${g.id}" data-url="${esc(g.image_url)}" class="del-photo mt-3 text-caption font-semibold text-red-300 hover:text-red-200">Delete</button>
+            </div>
+          </div>`).join('') || '<p class="text-sand text-caption">No photos yet.</p>';
+
+        list.querySelectorAll('.del-photo').forEach((btn) => btn.addEventListener('click', async () => {
+          if (!confirm('Delete this photo?')) return;
+          await supabase.from('gallery_images').delete().eq('id', btn.dataset.del);
+          // best-effort: remove the storage object if it lives in our bucket
+          const m = btn.dataset.url.match(/\/storage\/v1\/object\/public\/gallery\/(.+)$/);
+          if (m) await supabase.storage.from('gallery').remove([decodeURIComponent(m[1])]);
+          loadGallery();
+        }));
+      }
+
+      $('gallery-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const status = $('g-status');
+        status.textContent = 'Uploading…';
+        try {
+          const file = $('g-file').files[0];
+          if (!file) throw new Error('Choose a photo first.');
+          const image_url = await uploadTo('gallery', file);
+          const { error } = await supabase.from('gallery_images').insert({
+            image_url,
+            alt: $('g-alt').value.trim(),
+            category: $('g-category').value,
+            caption: $('g-caption').value.trim() || null,
+            sort_order: parseInt($('g-order').value || '0', 10),
+          });
+          if (error) throw error;
+          status.textContent = 'Added ✓';
+          $('gallery-form').reset();
+          loadGallery();
+          setTimeout(() => (status.textContent = ''), 2500);
+        } catch (err) {
+          status.textContent = 'Error: ' + err.message;
+        }
+      });
+
+      // ---------- Blog ----------
+      async function loadPosts() {
+        const list = $('post-list');
+        const { data, error } = await supabase.from('posts').select('*').order('created_at', { ascending: false });
+        if (error) { list.innerHTML = `<p class="text-red-300 text-caption">${esc(error.message)}</p>`; return; }
+        list.innerHTML = (data || []).map((p) => `
+          <div class="card flex items-center justify-between gap-3 p-4">
+            <div>
+              <p class="font-display text-lg">${esc(p.title)}</p>
+              <p class="text-caption text-sand">${p.published ? '<span class="text-gold">Published</span>' : 'Draft'} · /blog/${esc(p.slug)}</p>
+            </div>
+            <div class="flex gap-2">
+              <button data-edit="${p.id}" class="edit-post btn-secondary px-3 py-1.5 text-caption">Edit</button>
+              <button data-del="${p.id}" class="del-post px-3 py-1.5 text-caption font-semibold text-red-300 hover:text-red-200">Delete</button>
+            </div>
+          </div>`).join('') || '<p class="text-sand text-caption">No posts yet.</p>';
+
+        window.__posts = data || [];
+        list.querySelectorAll('.edit-post').forEach((b) => b.addEventListener('click', () => openEditor(window.__posts.find((x) => x.id === b.dataset.edit))));
+        list.querySelectorAll('.del-post').forEach((b) => b.addEventListener('click', async () => {
+          if (!confirm('Delete this post?')) return;
+          await supabase.from('posts').delete().eq('id', b.dataset.del);
+          loadPosts();
+        }));
+      }
+
+      const editor = $('post-editor');
+      function openEditor(post) {
+        editor.classList.remove('hidden');
+        $('editor-title').textContent = post ? 'Edit post' : 'New post';
+        $('p-id').value = post?.id || '';
+        $('p-title').value = post?.title || '';
+        $('p-slug').value = post?.slug || '';
+        $('slug-preview').textContent = post?.slug || 'your-slug';
+        $('p-excerpt').value = post?.excerpt || '';
+        $('p-body').value = post?.body || '';
+        $('p-published').checked = !!post?.published;
+        $('p-cover-url').value = post?.cover_url || '';
+        const prev = $('p-cover-preview');
+        if (post?.cover_url) { prev.src = post.cover_url; prev.classList.remove('hidden'); }
+        else prev.classList.add('hidden');
+        $('p-cover-file').value = '';
+        editor.scrollIntoView({ behavior: 'smooth' });
+      }
+      $('new-post-btn').addEventListener('click', () => openEditor(null));
+      $('cancel-post').addEventListener('click', () => editor.classList.add('hidden'));
+
+      $('p-title').addEventListener('input', () => {
+        if (!$('p-id').value && !$('p-slug').dataset.touched) {
+          $('p-slug').value = slugify($('p-title').value);
+          $('slug-preview').textContent = $('p-slug').value || 'your-slug';
+        }
+      });
+      $('p-slug').addEventListener('input', () => {
+        $('p-slug').dataset.touched = '1';
+        $('slug-preview').textContent = slugify($('p-slug').value) || 'your-slug';
+      });
+
+      $('post-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const status = $('p-status');
+        status.textContent = 'Saving…';
+        try {
+          let cover_url = $('p-cover-url').value || null;
+          const coverFile = $('p-cover-file').files[0];
+          if (coverFile) cover_url = await uploadTo('blog', coverFile);
+
+          const id = $('p-id').value;
+          const published = $('p-published').checked;
+          const payload = {
+            title: $('p-title').value.trim(),
+            slug: slugify($('p-slug').value || $('p-title').value),
+            excerpt: $('p-excerpt').value.trim() || null,
+            body: $('p-body').value,
+            cover_url,
+            published,
+          };
+
+          if (id) {
+            const orig = (window.__posts || []).find((x) => x.id === id);
+            payload.published_at = published ? (orig?.published_at || new Date().toISOString()) : null;
+            const { error } = await supabase.from('posts').update(payload).eq('id', id);
+            if (error) throw error;
+          } else {
+            payload.published_at = published ? new Date().toISOString() : null;
+            const { error } = await supabase.from('posts').insert(payload);
+            if (error) throw error;
+          }
+          status.textContent = 'Saved ✓';
+          editor.classList.add('hidden');
+          $('p-slug').dataset.touched = '';
+          loadPosts();
+        } catch (err) {
+          status.textContent = 'Error: ' + err.message;
+        }
+      });
+
+      // ---------- Messages ----------
+      async function loadMessages() {
+        const list = $('message-list');
+        const badge = $('msg-badge');
+        const { data, error } = await supabase.from('messages').select('*').order('created_at', { ascending: false });
+        if (error) { list.innerHTML = `<p class="text-red-300 text-caption">${esc(error.message)}</p>`; return; }
+        const msgs = data || [];
+        const unhandled = msgs.filter((m) => !m.handled).length;
+        if (unhandled > 0) { badge.textContent = String(unhandled); badge.classList.remove('hidden'); }
+        else badge.classList.add('hidden');
+
+        const fmt = (d) => new Date(d).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+        const reg = { self: 'About themselves', family: 'About a family member', referral: 'Client referral' };
+        list.innerHTML = msgs.map((m) => `
+          <div class="card p-5 ${m.handled ? 'opacity-60' : ''}">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span class="font-display text-lg">${esc(m.name)}</span>
+                <span class="ml-2 rounded-full bg-gold/15 px-2 py-0.5 text-caption text-gold">${esc(reg[m.regarding] || m.regarding || '')}</span>
+              </div>
+              <span class="text-caption text-sand">${fmt(m.created_at)}</span>
+            </div>
+            <div class="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-caption">
+              <a href="tel:${esc(m.phone)}" class="text-gold hover:underline">${esc(m.phone)}</a>
+              ${m.email ? `<a href="mailto:${esc(m.email)}" class="text-gold hover:underline">${esc(m.email)}</a>` : ''}
+            </div>
+            ${m.message ? `<p class="mt-3 text-cream/85">${esc(m.message)}</p>` : ''}
+            <div class="mt-3 flex gap-3">
+              <button data-handle="${m.id}" data-state="${m.handled}" class="msg-handle text-caption font-semibold text-gold hover:text-gold-light">
+                ${m.handled ? 'Mark as new' : 'Mark as handled'}
+              </button>
+              <button data-del="${m.id}" class="msg-del text-caption font-semibold text-red-300 hover:text-red-200">Delete</button>
+            </div>
+          </div>`).join('') || '<p class="text-sand text-caption">No messages yet.</p>';
+
+        list.querySelectorAll('.msg-handle').forEach((b) => b.addEventListener('click', async () => {
+          await supabase.from('messages').update({ handled: b.dataset.state !== 'true' }).eq('id', b.dataset.handle);
+          loadMessages();
+        }));
+        list.querySelectorAll('.msg-del').forEach((b) => b.addEventListener('click', async () => {
+          if (!confirm('Delete this message?')) return;
+          await supabase.from('messages').delete().eq('id', b.dataset.del);
+          loadMessages();
+        }));
+      }
+
+      // boot
+      refreshAuth();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+---
+/**
+ * Renders the brand logo image from public/images/logo/logo.png.
+ * TODO[CLIENT]: drop the real logo at public/images/logo/logo.png (transparent
+ * PNG or SVG). If the logo already includes the full wordmark, set the parent's
+ * `showWordmark` to false in Header.astro so the name isn't duplicated.
+ */
+interface Props { class?: string; }
+const { class: className = 'h-9 w-auto' } = Astro.props;
+---
+<img src="/images/logo/logo.png" alt="Zion Classique Care logo" class={className} width="160" height="160" />

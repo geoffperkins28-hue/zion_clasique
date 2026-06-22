@@ -1,0 +1,68 @@
+---
+export const prerender = false; // live from Supabase
+import { marked } from 'marked';
+import Base from '../../layouts/Base.astro';
+import CTABand from '../../components/CTABand.astro';
+import FleurDeLis from '../../components/FleurDeLis.astro';
+import { getPostBySlug } from '../../lib/content';
+
+const { slug } = Astro.params;
+const post = slug ? await getPostBySlug(slug) : null;
+
+if (!post) {
+  return Astro.redirect('/blog');
+}
+
+const fmtDate = (d?: string | null) =>
+  d ? new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+
+marked.setOptions({ breaks: true });
+const html = post.body ? marked.parse(post.body) : '';
+---
+<Base title={post.title} description={post.excerpt ?? post.title} ogImage={post.cover_url ?? undefined}>
+  <article>
+    <!-- Header -->
+    <header class="relative overflow-hidden bg-charcoal">
+      <FleurDeLis class="pointer-events-none absolute left-1/2 top-1/2 h-[120%] w-auto -translate-x-1/2 -translate-y-1/2 text-gold opacity-[0.04]" />
+      <div class="container-page relative max-w-3xl py-16 text-center sm:py-20">
+        <a href="/blog" class="text-caption font-semibold text-gold hover:text-gold-light">← Back to news</a>
+        {post.published_at && (
+          <time class="mt-4 block text-caption text-sand" datetime={post.published_at}>{fmtDate(post.published_at)}</time>
+        )}
+        <h1 class="mt-2 text-h1">{post.title}</h1>
+        {post.excerpt && <p class="lede mx-auto mt-5 max-w-2xl text-cream">{post.excerpt}</p>}
+      </div>
+    </header>
+
+    {post.cover_url && (
+      <div class="container-page max-w-4xl -mt-2">
+        <img src={post.cover_url} alt={post.title} class="w-full rounded-card border border-gold/10 object-cover" />
+      </div>
+    )}
+
+    <!-- Body -->
+    <div class="bg-ink">
+      <div class="container-page max-w-3xl py-14 sm:py-16">
+        <div class="prose-care" set:html={html} />
+      </div>
+    </div>
+  </article>
+
+  <CTABand />
+</Base>
+
+<style is:global>
+  /* Lightweight typographic styling for rendered markdown. */
+  .prose-care { color: theme('colors.cream'); font-size: 1.0625rem; line-height: 1.8; }
+  .prose-care > * + * { margin-top: 1.25rem; }
+  .prose-care h2 { font-family: theme('fontFamily.display'); color: theme('colors.gold'); font-size: 1.6rem; margin-top: 2rem; }
+  .prose-care h3 { font-family: theme('fontFamily.display'); color: theme('colors.gold'); font-size: 1.3rem; margin-top: 1.5rem; }
+  .prose-care a { color: theme('colors.gold'); text-decoration: underline; text-underline-offset: 3px; }
+  .prose-care a:hover { color: theme('colors.gold-light'); }
+  .prose-care ul { list-style: disc; padding-left: 1.5rem; }
+  .prose-care ol { list-style: decimal; padding-left: 1.5rem; }
+  .prose-care li + li { margin-top: 0.4rem; }
+  .prose-care blockquote { border-left: 3px solid theme('colors.gold'); padding-left: 1rem; color: theme('colors.sand'); font-style: italic; }
+  .prose-care img { border-radius: 12px; border: 1px solid rgb(201 162 75 / 0.15); }
+  .prose-care strong { color: theme('colors.cream'); font-weight: 600; }
+</style>

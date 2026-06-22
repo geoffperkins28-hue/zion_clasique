@@ -1,0 +1,16 @@
+---
+import Icon from './Icon.astro';
+interface Props {
+  icon: string;
+  title: string;
+  description: string;
+}
+const { icon, title, description } = Astro.props;
+---
+<article class="card card-hover flex h-full flex-col p-6 sm:p-7">
+  <span class="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-btn bg-gold/10 text-gold ring-1 ring-gold/20">
+    <Icon name={icon} class="h-6 w-6" />
+  </span>
+  <h3 class="text-h3">{title}</h3>
+  <p class="mt-2 text-cream/85">{description}</p>
+</article>
