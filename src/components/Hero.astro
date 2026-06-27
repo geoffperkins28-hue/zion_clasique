@@ -1,21 +1,30 @@
 ---
 import Icon from './Icon.astro';
 import { PRIMARY_PHONE } from '../config/site';
-// TODO[CLIENT]: replace public/images/hero/hero.jpg with real facility photography.
-const heroSrc = '/images/hero/hero.jpg';
+// Hero background. The static poster (hero.jpg) shows instantly + as the
+// reduced-motion / no-video fallback. Drop an MP4 at public/images/hero/hero.mp4
+// (optionally hero.webm) and it plays as a looping, muted video behind the text.
+// TODO[CLIENT]: replace hero.jpg (poster) + hero.mp4 (motion) with real footage.
+const heroPoster = '/images/hero/hero.jpg';
+const heroVideoMp4 = '/images/hero/hero.mp4';
+const heroVideoWebm = '/images/hero/hero.webm';
 ---
 <section class="relative isolate overflow-hidden">
-  <!-- Background image — kept clearly visible; gradient handles text contrast. -->
-  <img
-    src={heroSrc}
-    alt=""
+  <!-- Background video — muted/looping; poster shows first paint + reduced-motion. -->
+  <video
+    id="hero-video"
+    poster={heroPoster}
+    muted
+    loop
+    playsinline
+    preload="auto"
     aria-hidden="true"
-    width="2000"
-    height="1200"
-    loading="eager"
-    fetchpriority="high"
+    tabindex="-1"
     class="absolute inset-0 h-full w-full object-cover"
-  />
+  >
+    <source src={heroVideoWebm} type="video/webm" />
+    <source src={heroVideoMp4} type="video/mp4" />
+  </video>
   <!-- Left-weighted gradient: dark behind the text (left), clear over the photo (right). -->
   <div class="absolute inset-0 bg-gradient-to-r from-ink via-ink/85 to-ink/60 lg:via-ink/75 lg:to-ink/20"></div>
   <!-- Bottom fade to blend into the next section. -->
@@ -49,4 +58,16 @@ const heroSrc = '/images/hero/hero.jpg';
       </div>
     </div>
   </div>
+
+  <script is:inline>
+    (function () {
+      const v = document.getElementById('hero-video');
+      if (!v) return;
+      // Respect reduced-motion: leave paused so only the poster shows.
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const play = () => { const p = v.play(); if (p) p.catch(() => {}); };
+      if (v.readyState >= 2) play();
+      else v.addEventListener('loadeddata', play, { once: true });
+    })();
+  </script>
 </section>
