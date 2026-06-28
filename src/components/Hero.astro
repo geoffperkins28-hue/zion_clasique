@@ -7,7 +7,6 @@ import { PRIMARY_PHONE } from '../config/site';
 // TODO[CLIENT]: replace hero.jpg (poster) + hero.mp4 (motion) with real footage.
 const heroPoster = '/images/hero/hero.jpg';
 const heroVideoMp4 = '/images/hero/hero.mp4';
-const heroVideoWebm = '/images/hero/hero.webm';
 ---
 <section class="relative isolate overflow-hidden">
   <!-- Background video — muted/looping; poster shows first paint + reduced-motion. -->
@@ -22,7 +21,6 @@ const heroVideoWebm = '/images/hero/hero.webm';
     tabindex="-1"
     class="absolute inset-0 h-full w-full object-cover"
   >
-    <source src={heroVideoWebm} type="video/webm" />
     <source src={heroVideoMp4} type="video/mp4" />
   </video>
   <!-- Left-weighted gradient: dark behind the text (left), clear over the photo (right). -->
